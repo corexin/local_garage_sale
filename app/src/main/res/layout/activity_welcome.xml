@@ -9,6 +9,13 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".WelcomeActivity" >
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/banner"
+        />
+
+
     <Button
         android:id="@+id/login_button"
         android:layout_width="wrap_content"

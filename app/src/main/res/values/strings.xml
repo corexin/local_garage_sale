@@ -7,8 +7,8 @@
 
     <integer name="google_play_services_version">7571000</integer>
 
-    <string name="app_name">Local Garage Sale</string>
-
+    <string name="app_name">Garage Sale</string>
+    <string name="activity_main_title">Your local Garage Sale</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
