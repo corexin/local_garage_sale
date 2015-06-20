@@ -7,8 +7,8 @@
 
     <integer name="google_play_services_version">7571000</integer>
 
-    <string name="app_name">Garage Sale</string>
-    <string name="activity_main_title">Your local Garage Sale</string>
+    <string name="app_name">Your local Garage Sale</string>
+    <string name="activity_main_title">Your Garage Sale</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
@@ -28,4 +28,15 @@
     <string name="login">Login</string>
     <string name="signup">Signup</string>
     <string name="powered_by">Powered by Parse</string>
+    <string name="action_add">Add</string>
+    <string name="title_activity_add">AddActivity</string>
+    <string name="add_new_gc">Add New Garage Sale</string>
+    <string name="action_save">Save</string>
+    <string name="progress_post">Saving...</string>
+    <string name="action_refresh">Refresh</string>
+    <string name="settings_distance_format">%d kms</string>
+    <string name="search_distance">Search Distance</string>
+    <string name="save_setting">Save Setting</string>
+    <string name="action_logout">Logout</string>
+    <string name="activity_setting_title">Setting</string>
 </resources>

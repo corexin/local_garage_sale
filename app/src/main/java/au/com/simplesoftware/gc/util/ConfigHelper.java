@@ -1,4 +1,4 @@
-package au.com.simplesoftware.localgaragesale.util;
+package au.com.simplesoftware.gc.util;
 
 import com.parse.ConfigCallback;
 import com.parse.ParseConfig;
@@ -38,7 +38,7 @@ public class ConfigHelper {
   }
 
   public List<Float> getSearchDistanceAvailableOptions() {
-    final List<Float> defaultOptions = Arrays.asList(250.0f, 1000.0f, 2000.0f, 5000.0f);
+    final List<Float> defaultOptions = Arrays.asList(10.0f, 20.0f, 30.0f, 40.0f, 50.0f);
 
     List<Number> options = config.getList("availableFilterDistances");
     if (options == null) {
@@ -53,8 +53,4 @@ public class ConfigHelper {
     return typedOptions;
   }
 
-  public int getPostMaxCharacterCount () {
-    int value = config.getInt("postMaxCharacterCount", 140);
-    return value;
-  }
 }

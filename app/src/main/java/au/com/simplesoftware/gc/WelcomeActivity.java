@@ -1,4 +1,4 @@
-package au.com.simplesoftware.localgaragesale;
+package au.com.simplesoftware.gc;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -15,10 +15,10 @@ public class WelcomeActivity extends Activity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_welcome);
+    setContentView(au.com.simplesoftware.gc.R.layout.activity_welcome);
 
     // Log in button click handler
-    Button loginButton = (Button) findViewById(R.id.login_button);
+    Button loginButton = (Button) findViewById(au.com.simplesoftware.gc.R.id.login_button);
     loginButton.setOnClickListener(new OnClickListener() {
       public void onClick(View v) {
         // Starts an intent of the log in activity
@@ -27,7 +27,7 @@ public class WelcomeActivity extends Activity {
     });
 
     // Sign up button click handler
-    Button signupButton = (Button) findViewById(R.id.signup_button);
+    Button signupButton = (Button) findViewById(au.com.simplesoftware.gc.R.id.signup_button);
     signupButton.setOnClickListener(new OnClickListener() {
       public void onClick(View v) {
         // Starts an intent for the sign up activity

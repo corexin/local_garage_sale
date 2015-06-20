@@ -2,14 +2,17 @@
 <project version="4">
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/app/libs/Parse-1.9.2.jar" charset="windows-1252" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/au/com/simplesoftware/localgaragesale/DispatchActivity.java" charset="windows-1252" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/au/com/simplesoftware/localgaragesale/GarageSaleApplication.java" charset="windows-1252" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/au/com/simplesoftware/localgaragesale/LoginActivity.java" charset="windows-1252" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/au/com/simplesoftware/localgaragesale/SignUpActivity.java" charset="windows-1252" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/au/com/simplesoftware/localgaragesale/WelcomeActivity.java" charset="windows-1252" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/au/com/simplesoftware/localgaragesale/bo/ParsePostMessage.java" charset="windows-1252" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/au/com/simplesoftware/localgaragesale/util/ConfigHelper.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/au/com/simplesoftware/gc/DispatchActivity.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/au/com/simplesoftware/gc/GarageSaleApplication.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/au/com/simplesoftware/gc/LoginActivity.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/au/com/simplesoftware/gc/SettingsActivity.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/au/com/simplesoftware/gc/SignUpActivity.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/au/com/simplesoftware/gc/WelcomeActivity.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/au/com/simplesoftware/gc/bo/ParseGarageSaleInfo.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/au/com/simplesoftware/gc/util/ConfigHelper.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/SettingsActivity.java" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/activity_login.xml" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/activity_settings.xml" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/activity_signup.xml" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/activity_welcome.xml" charset="windows-1252" />
     <file url="PROJECT" charset="UTF-8" />

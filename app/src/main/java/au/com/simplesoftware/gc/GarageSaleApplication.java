@@ -1,4 +1,4 @@
-package au.com.simplesoftware.localgaragesale;
+package au.com.simplesoftware.gc;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -6,24 +6,16 @@ import android.content.SharedPreferences;
 import com.parse.Parse;
 import com.parse.ParseObject;
 
-import au.com.simplesoftware.localgaragesale.bo.ParsePostMessage;
-import au.com.simplesoftware.localgaragesale.util.ConfigHelper;
+import au.com.simplesoftware.gc.util.ConfigHelper;
+import au.com.simplesoftware.gc.bo.ParseGarageSaleInfo;
 
 
 public class GarageSaleApplication extends android.app.Application {
-  // Debugging switch
-  public static final boolean APPDEBUG = false;
-
-  // Debugging tag for the application
-  public static final String APPTAG = "AnyWall";
-
-  // Used to pass location from MainActivity to PostActivity
-  public static final String INTENT_EXTRA_LOCATION = "location";
 
   // Key for saving the search distance preference
   private static final String KEY_SEARCH_DISTANCE = "searchDistance";
 
-  private static final float DEFAULT_SEARCH_DISTANCE = 250.0f;
+  private static final float DEFAULT_SEARCH_DISTANCE = 20.0f;
 
   private static SharedPreferences preferences;
   private static ConfigHelper configHelper;
@@ -35,9 +27,12 @@ public class GarageSaleApplication extends android.app.Application {
   public void onCreate() {
     super.onCreate();
 
-    ParseObject.registerSubclass(ParsePostMessage.class);
+    ParseObject.registerSubclass(ParseGarageSaleInfo.class);
+    // Enable Local Datastore.
+    Parse.enableLocalDatastore(this);
 
-    Parse.initialize(this, "RwjLNIOfjrpPsNdEjPurrPnOCMdXRr7Hctr7w3lF", "z7t0G3ZSdBvEeDmX9c5QU33SOfeXWslklQrjWJ8w");
+    Parse.initialize(this, "P8yzXOB16Qh5Tk0iUiooMDFd239aPvyC0QVAoy58", "at34PyVBLSd6BtjQercp3qMUc61Q1l1GhRwgSRbZ");
+
     preferences = getSharedPreferences("com.parse.garagesale", Context.MODE_PRIVATE);
 
     configHelper = new ConfigHelper();

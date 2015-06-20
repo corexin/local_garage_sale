@@ -5,7 +5,7 @@ android {
     buildToolsVersion "22.0.1"
 
     defaultConfig {
-        applicationId "au.com.simplesoftware.localgaragesale"
+        applicationId "au.com.simplesoftware.gc"
         minSdkVersion 16
         targetSdkVersion 22
         versionCode 1
@@ -28,4 +28,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:22.1.1'
     compile 'com.google.android.gms:play-services:7.5.0'
     compile files('libs/Parse-1.9.2.jar')
+    compile 'com.parse.bolts:bolts-android:1.+'
 }

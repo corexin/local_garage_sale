@@ -1,4 +1,4 @@
-package au.com.simplesoftware.localgaragesale;
+package au.com.simplesoftware.gc;
 
 import android.app.Activity;
 import android.content.Intent;

@@ -1,4 +1,4 @@
-package au.com.simplesoftware.localgaragesale;
+package au.com.simplesoftware.gc;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -29,17 +29,17 @@ public class SignUpActivity extends Activity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    setContentView(R.layout.activity_signup);
+    setContentView(au.com.simplesoftware.gc.R.layout.activity_signup);
 
     // Set up the signup form.
-    usernameEditText = (EditText) findViewById(R.id.username_edit_text);
+    usernameEditText = (EditText) findViewById(au.com.simplesoftware.gc.R.id.username_edit_text);
 
-    passwordEditText = (EditText) findViewById(R.id.password_edit_text);
-    passwordAgainEditText = (EditText) findViewById(R.id.password_again_edit_text);
+    passwordEditText = (EditText) findViewById(au.com.simplesoftware.gc.R.id.password_edit_text);
+    passwordAgainEditText = (EditText) findViewById(au.com.simplesoftware.gc.R.id.password_again_edit_text);
     passwordAgainEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
       @Override
       public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-        if (actionId == R.id.edittext_action_signup ||
+        if (actionId == au.com.simplesoftware.gc.R.id.edittext_action_signup ||
             actionId == EditorInfo.IME_ACTION_UNSPECIFIED) {
           signup();
           return true;
@@ -49,7 +49,7 @@ public class SignUpActivity extends Activity {
     });
 
     // Set up the submit button click handler
-    Button mActionButton = (Button) findViewById(R.id.action_button);
+    Button mActionButton = (Button) findViewById(au.com.simplesoftware.gc.R.id.action_button);
     mActionButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View view) {
         signup();
@@ -64,26 +64,26 @@ public class SignUpActivity extends Activity {
 
     // Validate the sign up data
     boolean validationError = false;
-    StringBuilder validationErrorMessage = new StringBuilder(getString(R.string.error_intro));
+    StringBuilder validationErrorMessage = new StringBuilder(getString(au.com.simplesoftware.gc.R.string.error_intro));
     if (username.length() == 0) {
       validationError = true;
-      validationErrorMessage.append(getString(R.string.error_blank_username));
+      validationErrorMessage.append(getString(au.com.simplesoftware.gc.R.string.error_blank_username));
     }
     if (password.length() == 0) {
       if (validationError) {
-        validationErrorMessage.append(getString(R.string.error_join));
+        validationErrorMessage.append(getString(au.com.simplesoftware.gc.R.string.error_join));
       }
       validationError = true;
-      validationErrorMessage.append(getString(R.string.error_blank_password));
+      validationErrorMessage.append(getString(au.com.simplesoftware.gc.R.string.error_blank_password));
     }
     if (!password.equals(passwordAgain)) {
       if (validationError) {
-        validationErrorMessage.append(getString(R.string.error_join));
+        validationErrorMessage.append(getString(au.com.simplesoftware.gc.R.string.error_join));
       }
       validationError = true;
-      validationErrorMessage.append(getString(R.string.error_mismatched_passwords));
+      validationErrorMessage.append(getString(au.com.simplesoftware.gc.R.string.error_mismatched_passwords));
     }
-    validationErrorMessage.append(getString(R.string.error_end));
+    validationErrorMessage.append(getString(au.com.simplesoftware.gc.R.string.error_end));
 
     // If there is a validation error, display the error
     if (validationError) {
@@ -94,7 +94,7 @@ public class SignUpActivity extends Activity {
 
     // Set up a progress dialog
     final ProgressDialog dialog = new ProgressDialog(SignUpActivity.this);
-    dialog.setMessage(getString(R.string.progress_signup));
+    dialog.setMessage(getString(au.com.simplesoftware.gc.R.string.progress_signup));
     dialog.show();
 
     // Set up a new Parse user
