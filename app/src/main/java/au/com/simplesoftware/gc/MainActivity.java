@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             startActivity(intent);
             return true;
         } else if (id == R.id.action_refresh) {
-            reloadParseData(null);
+            onLocationChanged(currentLocation);
             return true;
         } else if (id == R.id.action_logout) {
             // Call the Parse log out method
