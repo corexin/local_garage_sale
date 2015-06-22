@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(au.com.simplesoftware.gc.R.layout.activity_main);
+        setContentView(R.layout.activity_main);
 
         LocationUtil.initiLocationRequest(locationRequest);
 
@@ -75,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         });
 
         mapFragment.getMap().setOnMarkerClickListener((GoogleMap.OnMarkerClickListener) this);
+        Log.d("GC", "onCreate");
     }
 
     @Override
@@ -122,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d("GC", "start");
+        Log.d("GC", "onStart");
         // Connect the client.
         if (LocationUtil.isGooglePlayServiceConnected(this)) {
             locationClient.connect();
@@ -132,22 +133,24 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     @Override
     protected void onResumeFragments() {
         super.onResumeFragments();
+        Log.d("GC", "onResumeFragments");
         if (locationClient.isConnected()) {
-            startLocationUpdates();
+            Log.d("GC", "location client connected");
+
         }
     }
 
     @Override
     protected void onStop() {
         // Disconnecting the client invalidates it.
-        Log.d("GC", "stop");
+        Log.d("GC", "onStop");
         locationClient.disconnect();
         super.onStop();
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.d("GC", "location changed");
+        Log.d("GC", "onLocationChanged");
 
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 10);
@@ -157,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     @Override
     public void onConnected(Bundle bundle) {
-        Log.d("GC", "location connected");
+        Log.d("GC", "onConnected");
 
         Location location = LocationServices.FusedLocationApi.getLastLocation(
                 locationClient);
@@ -175,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     protected void startLocationUpdates() {
         LocationServices.FusedLocationApi.requestLocationUpdates(
                 locationClient, locationRequest, this);
-        Log.d("GC", "start location update");
+        Log.d("GC", "onConnectionSuspended");
     }
 
     protected void stopLocationUpdates() {
@@ -202,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             public void done(final List<ParseGarageSaleInfo> list, com.parse.ParseException e) {
                 if (e == null) {
                     // if query return a list
-                    Log.d("GV", list.size() + "");
+                    Log.d("GV", "Found "+list.size() + " records");
                     mapFragment.getMap().clear();
                     markers.clear();
 
@@ -221,7 +224,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     private void addMarker(ParseGarageSaleInfo gc, String title) {
         LatLng latlng = new LatLng(gc.getLocation().getLatitude(), gc.getLocation().getLongitude());
         MarkerOptions opt = new MarkerOptions().position(latlng).title("Garage Sale").icon(
-                BitmapDescriptorFactory.fromResource(R.drawable.garage_marker_icon));
+                BitmapDescriptorFactory.fromResource(R.drawable.marker_48));
         Marker marker = mapFragment.getMap().addMarker(opt);
         markers.put(marker.getId(), gc);
     }

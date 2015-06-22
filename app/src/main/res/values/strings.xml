@@ -26,7 +26,7 @@
     <string name="progress_signup">Signing you up&#8230;</string>
     <string name="login">Login</string>
     <string name="signup">Signup</string>
-    <string name="powered_by">Powered by Parse</string>
+    <string name="powered_by">Designed by Chao Jiang</string>
     <string name="action_add">Add</string>
     <string name="title_activity_add">AddActivity</string>
     <string name="add_new_gc">Add New Garage Sale</string>
