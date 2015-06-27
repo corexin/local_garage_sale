@@ -38,4 +38,8 @@
     <string name="save_setting">Save Setting</string>
     <string name="action_logout">Logout</string>
     <string name="activity_setting_title">Setting</string>
+
+    <string name="author_RayYao">Ray Yao</string>
+    <string name="author_HelenDing">Helen Ding</string>
+    <string name="author_ChaoJiang">Chao Jiang</string>
 </resources>

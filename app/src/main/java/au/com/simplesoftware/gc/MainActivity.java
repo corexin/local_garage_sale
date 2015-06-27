@@ -136,7 +136,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         Log.d("GC", "onResumeFragments");
         if (locationClient.isConnected()) {
             Log.d("GC", "location client connected");
-
         }
     }
 
@@ -151,10 +150,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     @Override
     public void onLocationChanged(Location location) {
         Log.d("GC", "onLocationChanged");
-
-        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 10);
-        mapFragment.getMap().animateCamera(cameraUpdate);
+        reloadCurrentPosition();
         reloadParseData(location);
     }
 
@@ -162,12 +158,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     public void onConnected(Bundle bundle) {
         Log.d("GC", "onConnected");
 
-        Location location = LocationServices.FusedLocationApi.getLastLocation(
-                locationClient);
-        reloadParseData(location);
-        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 15);
-        mapFragment.getMap().animateCamera(cameraUpdate);
+        reloadCurrentPosition();
     }
 
     @Override
@@ -205,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             public void done(final List<ParseGarageSaleInfo> list, com.parse.ParseException e) {
                 if (e == null) {
                     // if query return a list
-                    Log.d("GV", "Found "+list.size() + " records");
+                    Log.d("GV", "Found " + list.size() + " records");
                     mapFragment.getMap().clear();
                     markers.clear();
 
@@ -239,6 +230,17 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 "Garage Sale : " + gc.getName() + ": " + gc.getPhoneNumber() + ": " + gc.getAddress(), Toast.LENGTH_LONG)
                 .show();
         return false;
+    }
 
+
+    private void reloadCurrentPosition() {
+        if (locationClient.isConnected()) {
+            currentLocation = LocationServices.FusedLocationApi.getLastLocation(
+                    locationClient);
+        }
+        reloadParseData(currentLocation);
+        LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 15);
+        mapFragment.getMap().moveCamera(cameraUpdate);
     }
 }
