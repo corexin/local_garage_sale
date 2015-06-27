@@ -42,4 +42,6 @@
     <string name="author_RayYao">Ray Yao</string>
     <string name="author_HelenDing">Helen Ding</string>
     <string name="author_ChaoJiang">Chao Jiang</string>
+    <string name="drawer_open">Open Drawer</string>
+    <string name="drawer_close">Close Drawer</string>
 </resources>
