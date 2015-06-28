@@ -1,7 +1,6 @@
 package au.com.simplesoftware.gc;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -9,14 +8,13 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
-
-import au.com.simplesoftware.gc.util.UIHelper;
 
 /**
  * Activity which displays a login screen to the user, offering registration as well.
@@ -25,13 +23,13 @@ public class LoginActivity extends Activity {
     // UI references.
     private EditText usernameEditText;
     private EditText passwordEditText;
-
+    protected ProgressBar mProgressBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(au.com.simplesoftware.gc.R.layout.activity_login);
-
+        mProgressBar = (ProgressBar)findViewById(R.id.progressBar);
         // Set up the login form.
         usernameEditText = (EditText) findViewById(au.com.simplesoftware.gc.R.id.username);
         passwordEditText = (EditText) findViewById(au.com.simplesoftware.gc.R.id.password);
@@ -84,13 +82,13 @@ public class LoginActivity extends Activity {
         }
 
         // Set up a progress dialog
-        final ProgressDialog dialog = UIHelper.displayProgressDialog(this, "Logging you in");
 
+        mProgressBar.setVisibility(View.VISIBLE);
         // Call the Parse login method
         ParseUser.logInInBackground(username, password, new LogInCallback() {
             @Override
             public void done(ParseUser user, ParseException e) {
-                dialog.dismiss();
+                mProgressBar.setVisibility(View.GONE);
                 if (e != null) {
                     // Show the error message
                     Toast.makeText(LoginActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();

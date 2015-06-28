@@ -1,18 +1,26 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".LoginActivity" >
+    tools:context=".LoginActivity">
 
     <!-- Login form -->
 
     <ScrollView
         android:id="@+id/login_form"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent">
 
         <LinearLayout
             style="@style/LoginFormContainer"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_alignParentBottom="true"
+                android:layout_margin="10dp"
+                />
             <EditText
                 android:id="@+id/username"
                 android:layout_width="match_parent"

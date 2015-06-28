@@ -1,7 +1,10 @@
 package au.com.simplesoftware.gc.util;
 
 import android.app.Activity;
+import android.content.Context;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -67,5 +70,12 @@ public class LocationUtil {
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         // Set the interval ceiling to one minute
         locationRequest.setFastestInterval(FAST_INTERVAL_CEILING_IN_MILLISECONDS);
+    }
+
+    public  static boolean isNetworkAvailable(Context context) {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 }

@@ -1,6 +1,5 @@
 package au.com.simplesoftware.gc;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
@@ -8,7 +7,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 
 import com.parse.ParseACL;
 import com.parse.ParseException;
@@ -18,7 +19,6 @@ import com.parse.SaveCallback;
 
 import au.com.simplesoftware.gc.bo.ParseGarageSaleInfo;
 import au.com.simplesoftware.gc.util.LocationUtil;
-import au.com.simplesoftware.gc.util.UIHelper;
 
 
 public class AddActivity extends AppCompatActivity {
@@ -29,7 +29,7 @@ public class AddActivity extends AppCompatActivity {
     private EditText phoneEditText;
     private EditText addressEditText;
     private EditText messageEditText;
-
+    protected ProgressBar mProgressBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +43,7 @@ public class AddActivity extends AppCompatActivity {
         Intent intent = getIntent();
         Location location = intent.getParcelableExtra(LocationUtil.INTENT_EXTRA_LOCATION);
         geoPoint = LocationUtil.generateParsePoint(location);
+        mProgressBar = (ProgressBar)findViewById(R.id.progressBar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
@@ -73,7 +74,7 @@ public class AddActivity extends AppCompatActivity {
     private void saveGarageSale () {
 
         // Set up a progress dialog
-        final ProgressDialog dialog = UIHelper.displayProgressDialog(this, getString(R.string.progress_post));
+        mProgressBar.setVisibility(View.VISIBLE);
 
         String name = nameEditText.getText().toString();
         String phone = phoneEditText.getText().toString();
@@ -99,7 +100,7 @@ public class AddActivity extends AppCompatActivity {
             @Override
             public void done(ParseException e) {
                 Log.d("GC","New Garage Sale Info Saved");
-                dialog.dismiss();
+                mProgressBar.setVisibility(View.GONE);
                 finish();
             }
         });

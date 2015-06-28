@@ -12,7 +12,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -34,11 +33,14 @@ import com.parse.FindCallback;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
+import au.com.simplesoftware.gc.adaptor.CustomDrawerAdapter;
 import au.com.simplesoftware.gc.bo.ParseGarageSaleInfo;
+import au.com.simplesoftware.gc.drawer.DrawerItem;
 import au.com.simplesoftware.gc.util.LocationUtil;
 
 
@@ -56,22 +58,22 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     private LocationRequest locationRequest;
     private GoogleApiClient locationClient;
 
-    private String[] mPlanetTitles;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
+
+    private List<DrawerItem> myGarageSales = new ArrayList<DrawerItem>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        getSupportActionBar().setIcon(R.drawable.drawer);
         getSupportActionBar().setDisplayUseLogoEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.drawer2);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.drawer);
 
-        mPlanetTitles = getResources().getStringArray(R.array.drawer_list_item);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
         mDrawerToggle = new ActionBarDrawerToggle(
@@ -86,20 +88,25 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 super.onDrawerClosed(view);
                 getSupportActionBar().setTitle("Garage Sale");
                 supportInvalidateOptionsMenu();
+
+
             }
 
             /** Called when a drawer has settled in a completely open state. */
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                getSupportActionBar().setTitle("Menu");
+                getSupportActionBar().setTitle("My Posts");
+
                 supportInvalidateOptionsMenu();
             }
         };
+
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
-        // Set the adapter for the list view
-        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
-                R.layout.drawer_list_item, mPlanetTitles));
+
+            // Set the adapter for the list view
+        mDrawerList.setAdapter(new CustomDrawerAdapter(this));
+
         // Set the list's click listener
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
@@ -129,17 +136,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-
-        if (mDrawerLayout != null ) {
-            getMenuInflater().inflate(R.menu.menu_main, menu);
-            return true;
-        }
-
         getMenuInflater().inflate(au.com.simplesoftware.gc.R.menu.menu_main, menu);
         return true;
     }
-
-    boolean showToggle=false;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -150,13 +149,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         Log.d("GaragelSale", "option selected ");
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             Log.d("GaragelSale", "home option selected ");
-            if (showToggle) {
-                mDrawerLayout.openDrawer(mDrawerList);
-                showToggle=false;
-            } else {
-                mDrawerLayout.closeDrawer(mDrawerList);
-                showToggle=true;
-            }
             return true;
         } else if (id == R.id.action_add) {
             Intent intent = new Intent(this, AddActivity.class);
@@ -336,7 +328,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         // Highlight the selected item, update the title, and close the drawer
         mDrawerList.setItemChecked(position, true);
-        setTitle(mPlanetTitles[position]);
 
         getSupportActionBar().setTitle("Test");
         mDrawerLayout.closeDrawer(mDrawerList);

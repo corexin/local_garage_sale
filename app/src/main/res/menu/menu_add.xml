@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="au.com.simplesoftware.gc.AddActivity">
 
-    <item android:id="@+id/action_save" android:title="@string/action_save"
-        android:orderInCategory="100" app:showAsAction="always" />
+    <item
+        android:id="@+id/action_save"
+        android:title="@string/action_save"
+        android:orderInCategory="100"
+        app:showAsAction="always" />
 </menu>
