@@ -13,10 +13,10 @@ import au.com.simplesoftware.gc.bo.ParseGarageSaleInfo;
 /**
  * Created by steven on 28/06/2015.
  */
-public class CustomDrawerAdapter extends ParseQueryAdapter<ParseGarageSaleInfo> {
+public class MyPostsAdapter extends ParseQueryAdapter<ParseGarageSaleInfo> {
 
-    public CustomDrawerAdapter(Context context) {
-        super(context, new AdaptorQueryFactory());
+    public MyPostsAdapter(Context context) {
+        super(context, new MyPostsAdaptorQueryFactory());
     }
 
     @Override

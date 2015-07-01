@@ -10,16 +10,22 @@
         android:id="@+id/drawer_item_image_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:src="@drawable/drawer_item_36" />
+        android:padding="5dp" />
 
     <TextView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/drawer_item_text_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:text=""
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@android:color/white" />
+        android:textColor="@android:color/holo_orange_light" />
 
+    <ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/drawer_item_delete_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:textAlignment="textEnd"
+        android:layout_gravity="end"
+        android:src="@drawable/list_remove32" />
 </LinearLayout>

@@ -9,7 +9,9 @@ import au.com.simplesoftware.gc.bo.ParseGarageSaleInfo;
 /**
  * Created by steven on 28/06/2015.
  */
-public class AdaptorQueryFactory implements ParseQueryAdapter.QueryFactory<ParseGarageSaleInfo> {
+public class
+
+        MyPostsAdaptorQueryFactory implements ParseQueryAdapter.QueryFactory<ParseGarageSaleInfo> {
 
     public ParseQuery<ParseGarageSaleInfo> create() {
 
@@ -18,7 +20,7 @@ public class AdaptorQueryFactory implements ParseQueryAdapter.QueryFactory<Parse
         ParseQuery<ParseGarageSaleInfo> query = ParseGarageSaleInfo.getQuery();
         query.include("user");
         query.orderByDescending("createdAt");
-        query.whereEqualTo("user",currentUser);
+        query.whereEqualTo("user", currentUser);
 
         return query;
     }

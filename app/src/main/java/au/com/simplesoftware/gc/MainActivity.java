@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -31,6 +32,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.FindCallback;
 import com.parse.ParseQuery;
+import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
@@ -38,7 +40,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
-import au.com.simplesoftware.gc.adaptor.CustomDrawerAdapter;
+import au.com.simplesoftware.gc.adaptor.MyPostsAdapter;
 import au.com.simplesoftware.gc.bo.ParseGarageSaleInfo;
 import au.com.simplesoftware.gc.drawer.DrawerItem;
 import au.com.simplesoftware.gc.util.LocationUtil;
@@ -58,8 +60,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     private LocationRequest locationRequest;
     private GoogleApiClient locationClient;
 
-    private DrawerLayout mDrawerLayout;
-    private ListView mDrawerList;
+    private LinearLayout leftDrawer;
+    private ListView myPostListView;
+    private ListView myFavoriteListView;
+    private DrawerLayout contentLayout;
+
     private ActionBarDrawerToggle mDrawerToggle;
 
     private List<DrawerItem> myGarageSales = new ArrayList<DrawerItem>();
@@ -74,11 +79,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.drawer);
 
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        leftDrawer = (LinearLayout) findViewById(R.id.left_drawer);
+        myPostListView =(ListView) findViewById(R.id.left_drawer_my_posts);
+        myFavoriteListView = (ListView) findViewById(R.id.left_drawer_my_favorites);
+        contentLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerToggle = new ActionBarDrawerToggle(
                 this,                  /* host Activity */
-                mDrawerLayout,         /* DrawerLayout object */
+                contentLayout,         /* DrawerLayout object */
                 R.string.drawer_open,  /* "open drawer" description */
                 R.string.drawer_close  /* "close drawer" description */
         ) {
@@ -88,27 +95,23 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 super.onDrawerClosed(view);
                 getSupportActionBar().setTitle("Garage Sale");
                 supportInvalidateOptionsMenu();
-
-
             }
 
             /** Called when a drawer has settled in a completely open state. */
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
                 getSupportActionBar().setTitle("My Posts");
-
                 supportInvalidateOptionsMenu();
             }
         };
 
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
-
+        contentLayout.setDrawerListener(mDrawerToggle);
 
             // Set the adapter for the list view
-        mDrawerList.setAdapter(new CustomDrawerAdapter(this));
-
+        myPostListView.setAdapter(new MyPostsAdapter(this));
+        myFavoriteListView.setAdapter(new MyPostsAdapter(this));
         // Set the list's click listener
-        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+        myPostListView.setOnItemClickListener(new DrawerItemClickListener());
 
         LocationUtil.initiLocationRequest(locationRequest);
 
@@ -192,6 +195,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     protected void onResumeFragments() {
         super.onResumeFragments();
         Log.d("GC", "onResumeFragments");
+        ((ParseQueryAdapter) myPostListView.getAdapter()).loadObjects();
         if (locationClient.isConnected()) {
             Log.d("GC", "location client connected");
         }
@@ -327,14 +331,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 //                .commit();
 
         // Highlight the selected item, update the title, and close the drawer
-        mDrawerList.setItemChecked(position, true);
+        myPostListView.setItemChecked(position, true);
 
         getSupportActionBar().setTitle("Test");
-        mDrawerLayout.closeDrawer(mDrawerList);
+        contentLayout.closeDrawer(leftDrawer);
     }
 
-    @Override
-    public void setTitle(CharSequence title) {
-
-    }
 }
