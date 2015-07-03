@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     private List<DrawerItem> myGarageSales = new ArrayList<DrawerItem>();
 
+    private MyPostsAdapter myPostsAdapter= new MyPostsAdapter(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,11 +79,21 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         getSupportActionBar().setDisplayUseLogoEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.drawer);
+        myPostsAdapter.setAutoload(true);
 
         leftDrawer = (LinearLayout) findViewById(R.id.left_drawer);
+        contentLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         myPostListView =(ListView) findViewById(R.id.left_drawer_my_posts);
         myFavoriteListView = (ListView) findViewById(R.id.left_drawer_my_favorites);
-        contentLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        // Set the adapter for the list view
+        myPostListView.setAdapter(myPostsAdapter);
+        myPostsAdapter.notifyDataSetChanged();
+        myFavoriteListView.setAdapter(myPostsAdapter);
+        // Set the list's click listener
+        myPostListView.setOnItemClickListener(new DrawerItemClickListener());
+
+
         mDrawerToggle = new ActionBarDrawerToggle(
                 this,                  /* host Activity */
                 contentLayout,         /* DrawerLayout object */
@@ -101,17 +112,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
                 getSupportActionBar().setTitle("My Posts");
+                myPostsAdapter.loadObjects();
                 supportInvalidateOptionsMenu();
             }
         };
 
         contentLayout.setDrawerListener(mDrawerToggle);
-
-            // Set the adapter for the list view
-        myPostListView.setAdapter(new MyPostsAdapter(this));
-        myFavoriteListView.setAdapter(new MyPostsAdapter(this));
-        // Set the list's click listener
-        myPostListView.setOnItemClickListener(new DrawerItemClickListener());
 
         LocationUtil.initiLocationRequest(locationRequest);
 
