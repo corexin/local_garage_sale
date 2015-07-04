@@ -1,6 +1,5 @@
 package au.com.simplesoftware.gc;
 
-import android.app.FragmentManager;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
@@ -21,8 +20,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -35,14 +32,13 @@ import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
+import au.com.simplesoftware.gc.adaptor.MyFavorateAdapter;
 import au.com.simplesoftware.gc.adaptor.MyPostsAdapter;
 import au.com.simplesoftware.gc.bo.ParseGarageSaleInfo;
-import au.com.simplesoftware.gc.drawer.DrawerItem;
 import au.com.simplesoftware.gc.util.LocationUtil;
 
 
@@ -50,8 +46,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnMarkerClickListener {
 
     private static final int MAX_POST_SEARCH_RESULTS = 20;
-
-    private HashMap<String, ParseGarageSaleInfo> markers = new HashMap<String, ParseGarageSaleInfo>();
 
     private SupportMapFragment mapFragment;
     private Location currentLocation;
@@ -67,9 +61,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     private ActionBarDrawerToggle mDrawerToggle;
 
-    private List<DrawerItem> myGarageSales = new ArrayList<DrawerItem>();
+    private HashMap<Marker, ParseGarageSaleInfo> markerGCMap = new HashMap<Marker, ParseGarageSaleInfo>();
+    private HashMap<ParseGarageSaleInfo, Marker> gcMakerMap = new HashMap<ParseGarageSaleInfo, Marker>();
 
-    private MyPostsAdapter myPostsAdapter= new MyPostsAdapter(this);
+    private MyPostsAdapter myPostsAdapter = new MyPostsAdapter(this);
+    private MyFavorateAdapter myFavorateAdapter = new MyFavorateAdapter(this);
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,15 +80,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         leftDrawer = (LinearLayout) findViewById(R.id.left_drawer);
         contentLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        myPostListView =(ListView) findViewById(R.id.left_drawer_my_posts);
+        myPostListView = (ListView) findViewById(R.id.left_drawer_my_posts);
         myFavoriteListView = (ListView) findViewById(R.id.left_drawer_my_favorites);
 
         // Set the adapter for the list view
         myPostListView.setAdapter(myPostsAdapter);
-        myPostsAdapter.notifyDataSetChanged();
-        myFavoriteListView.setAdapter(myPostsAdapter);
+        myFavoriteListView.setAdapter(myFavorateAdapter);
+
         // Set the list's click listener
         myPostListView.setOnItemClickListener(new DrawerItemClickListener());
+        myFavoriteListView.setOnItemClickListener(new DrawerItemClickListener());
 
 
         mDrawerToggle = new ActionBarDrawerToggle(
@@ -266,7 +264,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                     // if query return a list
                     Log.d("GV", "Found " + list.size() + " records");
                     mapFragment.getMap().clear();
-                    markers.clear();
+                    markerGCMap.clear();
 
                     for (ParseGarageSaleInfo gc : list) {
                         addMarker(gc, "Garage Sale");
@@ -285,14 +283,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         MarkerOptions opt = new MarkerOptions().position(latlng).title("Garage Sale").icon(
                 BitmapDescriptorFactory.fromResource(R.drawable.marker_48));
         Marker marker = mapFragment.getMap().addMarker(opt);
-        markers.put(marker.getId(), gc);
+        markerGCMap.put(marker, gc);
+        gcMakerMap.put(gc, marker);
     }
 
     @Override
     public boolean onMarkerClick(Marker marker) {
 
         Log.i("GoogleMapActivity", "onMarkerClick");
-        ParseGarageSaleInfo gc = markers.get(marker.getId());
+        ParseGarageSaleInfo gc = markerGCMap.get(marker);
 
         Toast.makeText(getApplicationContext(),
                 "Garage Sale : " + gc.getName() + ": " + gc.getPhoneNumber() + ": " + gc.getAddress(), Toast.LENGTH_LONG)
@@ -300,18 +299,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         return false;
     }
 
-
     private void reloadCurrentPosition() {
         if (locationClient.isConnected()) {
             currentLocation = LocationServices.FusedLocationApi.getLastLocation(
                     locationClient);
         }
         reloadParseData(currentLocation);
-        LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 15);
-        mapFragment.getMap().moveCamera(cameraUpdate);
+        LocationUtil.moveTo(mapFragment.getMap(), currentLocation, 15);
     }
-
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
@@ -324,23 +319,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
      * Swaps fragments in the main content view
      */
     private void selectItem(int position) {
-        // Create a new fragment and specify the planet to show based on position
 
-        Bundle args = new Bundle();
-//        args.putInt(PlanetFragment.ARG_PLANET_NUMBER, position);
-        mapFragment.setArguments(args);
 
-        // Insert the fragment by replacing any existing fragment
-        FragmentManager fragmentManager = getFragmentManager();
-//        fragmentManager.beginTransaction()
-//                .replace(R.id.content_frame, mapFragment)
-//                .commit();
-
-        // Highlight the selected item, update the title, and close the drawer
-        myPostListView.setItemChecked(position, true);
-
-        getSupportActionBar().setTitle("Test");
         contentLayout.closeDrawer(leftDrawer);
+
+        ParseGarageSaleInfo gc = (ParseGarageSaleInfo) myPostsAdapter.getItem(position);
+        Marker marker = gcMakerMap.get(gc);
+        LocationUtil.animateTo(mapFragment.getMap(), marker.getPosition(), 15);
+
     }
 
 }

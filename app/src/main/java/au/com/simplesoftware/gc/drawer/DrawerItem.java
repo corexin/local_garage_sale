@@ -6,7 +6,7 @@ import au.com.simplesoftware.gc.R;
  * Created by steven on 27/06/2015.
  */
 public class DrawerItem {
-    public enum TYPE {SECTION_TITLE, MY_ITEM,MY_FAVERATE_ITEM}
+    public enum TYPE {MY_ITEM,MY_FAVERATE_ITEM}
 
     public TYPE type;
     public int icon;

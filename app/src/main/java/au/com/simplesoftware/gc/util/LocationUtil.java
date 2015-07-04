@@ -10,6 +10,10 @@ import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
 import com.parse.ParseGeoPoint;
 
 /**
@@ -77,5 +81,29 @@ public class LocationUtil {
                 = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    public static void animateTo(GoogleMap map, Location location, int zoom)
+    {
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        animateTo(map,latLng, zoom);
+    }
+
+    public static void animateTo(GoogleMap map, LatLng latLng, int zoom)
+    {
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, zoom);
+        map.animateCamera(cameraUpdate);
+    }
+
+    public static void moveTo(GoogleMap map, Location location, int zoom)
+    {
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        moveTo(map, latLng, zoom);
+    }
+
+    public static void moveTo(GoogleMap map, LatLng latLng, int zoom)
+    {
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, zoom);
+        map.moveCamera(cameraUpdate);
     }
 }

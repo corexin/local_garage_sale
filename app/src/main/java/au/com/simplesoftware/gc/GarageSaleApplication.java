@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import com.parse.Parse;
 import com.parse.ParseObject;
 
+import au.com.simplesoftware.gc.bo.ParseMyFavoriate;
 import au.com.simplesoftware.gc.util.ConfigHelper;
 import au.com.simplesoftware.gc.bo.ParseGarageSaleInfo;
 
@@ -28,6 +29,7 @@ public class GarageSaleApplication extends android.app.Application {
     super.onCreate();
 
     ParseObject.registerSubclass(ParseGarageSaleInfo.class);
+    ParseObject.registerSubclass(ParseMyFavoriate.class);
     // Enable Local Datastore.
     Parse.enableLocalDatastore(this);
 
