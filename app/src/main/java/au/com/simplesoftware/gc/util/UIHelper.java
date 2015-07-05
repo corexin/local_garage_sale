@@ -6,4 +6,9 @@ package au.com.simplesoftware.gc.util;
 public class UIHelper {
 
 
+    public static boolean isNotEmpty(String text)
+    {
+        return text == null || text.trim().length()==0;
+    }
+
 }

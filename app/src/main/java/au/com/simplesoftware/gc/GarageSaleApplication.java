@@ -21,6 +21,8 @@ public class GarageSaleApplication extends android.app.Application {
   private static SharedPreferences preferences;
   private static ConfigHelper configHelper;
 
+  public static final String INTENT_EXTRA_GARAGESALE = "intent_garagesale";
+
   public GarageSaleApplication() {
   }
 

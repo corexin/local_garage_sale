@@ -5,28 +5,35 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 /**
  * Data model for a post.
  */
 @ParseClassName("MyFavoriate")
-public class ParseMyFavoriate extends ParseObject {
+public class ParseMyFavoriate extends ParseObject implements Serializable {
+
+    public static final String userKey = "user";
+    public static final String favoriateKey = "favoriate";
+
+
     public ParseUser getUser() {
-        return getParseUser("user");
+        return getParseUser(userKey);
     }
 
     public void setUser(ParseUser value) {
-        put("user", value);
+        put(userKey, value);
     }
 
     public ParseGarageSaleInfo getGarageSale() {
-        return (ParseGarageSaleInfo) getParseObject("garagesale");
+        return (ParseGarageSaleInfo) getParseObject(favoriateKey);
     }
 
     public void setGarageSale(ParseGarageSaleInfo gc) {
-        put("garagesale", gc);
+        put(favoriateKey, gc);
     }
+
 
     public static ParseQuery<ParseMyFavoriate> getQuery() {
         return ParseQuery.getQuery(ParseMyFavoriate.class);
@@ -35,7 +42,7 @@ public class ParseMyFavoriate extends ParseObject {
     @Override
     public int hashCode() {
         return Arrays.hashCode(new Object[]{
-                getUser(), getGarageSale()
+                getUser(), getGarageSale().getObjectId()
         });
     }
 
@@ -43,9 +50,7 @@ public class ParseMyFavoriate extends ParseObject {
     public boolean equals(Object o) {
         if (o instanceof ParseMyFavoriate) {
             ParseMyFavoriate other = (ParseMyFavoriate) o;
-            return Arrays.equals(new Object[]{getGarageSale()
-                    , getUser()}, new Object[]{other.getGarageSale()
-                    , other.getUser()});
+            return Arrays.equals(new Object[]{getUser(), getGarageSale().getObjectId()}, new Object[]{other.getUser(), other.getGarageSale().getObjectId()});
 
         } else {
             return false;

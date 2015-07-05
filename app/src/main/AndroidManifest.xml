@@ -51,7 +51,7 @@
             android:name=".MainActivity"
             android:label="@string/activity_main_title"
             android:screenOrientation="portrait"
-            android:launchMode="singleInstance"
+            android:launchMode="singleTop"
             />
 
         <activity
@@ -60,8 +60,8 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".AddActivity"
-            android:label="@string/title_activity_add"
+            android:name=".EditGarageSaleActivity"
+            android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:parentActivityName="au.com.simplesoftware.gc.MainActivity">
             <meta-data

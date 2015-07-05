@@ -21,7 +21,6 @@ import com.parse.ParseGeoPoint;
  */
 public class LocationUtil {
 
-    public static final String INTENT_EXTRA_LOCATION = "location";
     // The update interval
     private static final int UPDATE_INTERVAL_IN_SECONDS = 5;
     // Milliseconds per second

@@ -6,13 +6,14 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 /**
  * Data model for a post.
  */
 @ParseClassName("GarageSaleInfo")
-public class ParseGarageSaleInfo extends ParseObject {
+public class ParseGarageSaleInfo extends ParseObject implements Serializable {
     public String getName() {
         return getString("name");
     }
@@ -28,6 +29,15 @@ public class ParseGarageSaleInfo extends ParseObject {
     public void setPhoneNumber(String value) {
         put("phone", value);
     }
+
+    public String getEmail() {
+        return getString("email");
+    }
+
+    public void setEmail(String email) {
+        put("email", email);
+    }
+
 
     public String getAddress() {
         return getString("address");

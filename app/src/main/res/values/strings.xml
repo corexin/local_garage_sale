@@ -8,7 +8,7 @@
     <integer name="google_play_services_version">7571000</integer>
 
     <string name="app_name">Garage Sale</string>
-    <string name="activity_main_title">Your Garage Sale</string>
+    <string name="activity_main_title">Garage Sale</string>
     <string name="action_settings">Settings</string>
 
     <string name="title_activity_login">Log in</string>
@@ -26,9 +26,7 @@
     <string name="progress_signup">Signing you up&#8230;</string>
     <string name="login">Login</string>
     <string name="signup">Signup</string>
-    <string name="powered_by">Designed by Chao Jiang</string>
     <string name="action_add">Add</string>
-    <string name="title_activity_add">AddActivity</string>
     <string name="add_new_gc">Add New Garage Sale</string>
     <string name="action_save">Save</string>
     <string name="progress_post">Saving...</string>
@@ -44,4 +42,5 @@
     <string name="author_ChaoJiang">Chao Jiang</string>
     <string name="drawer_open">Open Drawer</string>
     <string name="drawer_close">Close Drawer</string>
+
 </resources>

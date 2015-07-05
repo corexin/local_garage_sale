@@ -13,15 +13,16 @@ public class
 
         MyFavoriateAdaptorQueryFactory implements ParseQueryAdapter.QueryFactory<ParseMyFavoriate> {
 
+
     public ParseQuery<ParseMyFavoriate> create() {
+        return generate();
+    }
 
-        ParseUser currentUser = ParseUser.getCurrentUser();
-
+    public static ParseQuery<ParseMyFavoriate> generate()
+    {   ParseUser currentUser = ParseUser.getCurrentUser();
         ParseQuery<ParseMyFavoriate> query = ParseMyFavoriate.getQuery();
-        query.include("user");
         query.orderByDescending("createdAt");
         query.whereEqualTo("user", currentUser);
-
         return query;
     }
 }
