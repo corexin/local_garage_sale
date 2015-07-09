@@ -22,7 +22,9 @@ public class
     {   ParseUser currentUser = ParseUser.getCurrentUser();
         ParseQuery<ParseMyFavoriate> query = ParseMyFavoriate.getQuery();
         query.orderByDescending("createdAt");
-        query.whereEqualTo("user", currentUser);
+        query.whereEqualTo(ParseMyFavoriate.userKey, currentUser);
+        query.include(ParseMyFavoriate.userKey);
+        query.include(ParseMyFavoriate.favoriateKey);
         return query;
     }
 }

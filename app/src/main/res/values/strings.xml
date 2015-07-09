@@ -42,5 +42,9 @@
     <string name="author_ChaoJiang">Chao Jiang</string>
     <string name="drawer_open">Open Drawer</string>
     <string name="drawer_close">Close Drawer</string>
+    <string name="network_connection_error_title">Network connection issue</string>
+    <string name="network_connection_error_messag">You might experience network connection issue, please retry again later.</string>
+    <string name="googleplay_connection_error_title">Error connecting to google play service</string>
+    <string name="googleplay_connection_error_messag">You might have issue connecting to Google Play service, please retry again later.</string>
 
 </resources>

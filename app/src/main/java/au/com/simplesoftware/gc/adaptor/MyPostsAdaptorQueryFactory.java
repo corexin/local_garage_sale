@@ -14,6 +14,10 @@ public class
         MyPostsAdaptorQueryFactory implements ParseQueryAdapter.QueryFactory<ParseGarageSaleInfo> {
 
     public ParseQuery<ParseGarageSaleInfo> create() {
+        return generate();
+    }
+    
+    public static ParseQuery<ParseGarageSaleInfo> generate() {
 
         ParseUser currentUser = ParseUser.getCurrentUser();
 
@@ -24,4 +28,6 @@ public class
 
         return query;
     }
+
+
 }

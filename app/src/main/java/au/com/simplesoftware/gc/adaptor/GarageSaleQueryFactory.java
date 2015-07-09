@@ -23,8 +23,10 @@ public class GarageSaleQueryFactory {
         query.whereGreaterThan("createdAt", currentCal.getTime());
 
         Float distance = GarageSaleApplication.getSearchDistance();
-        query.whereWithinKilometers("location", LocationUtil.geoPointFromLocation(currentLocation), distance);
+        query.whereWithinKilometers("location", LocationUtil.generateParsePoint(currentLocation), distance);
+
         query.setLimit(MainActivity.MAX_POST_SEARCH_RESULTS);
+
         return query;
     }
 }

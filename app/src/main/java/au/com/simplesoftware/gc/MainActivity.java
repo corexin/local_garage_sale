@@ -9,17 +9,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -39,33 +33,27 @@ import au.com.simplesoftware.gc.adaptor.GarageSaleQueryFactory;
 import au.com.simplesoftware.gc.adaptor.MyFavoriateAdapter;
 import au.com.simplesoftware.gc.adaptor.MyFavoriateAdaptorQueryFactory;
 import au.com.simplesoftware.gc.adaptor.MyPostsAdapter;
+import au.com.simplesoftware.gc.adaptor.MyPostsAdaptorQueryFactory;
 import au.com.simplesoftware.gc.bo.ParseGarageSaleInfo;
 import au.com.simplesoftware.gc.bo.ParseMyFavoriate;
+import au.com.simplesoftware.gc.listener.DrawerToggleListener;
+import au.com.simplesoftware.gc.listener.MarkerClickListener;
+import au.com.simplesoftware.gc.listener.MyFavoriateItemClickListener;
+import au.com.simplesoftware.gc.listener.MyPostItemClickListener;
 import au.com.simplesoftware.gc.util.DualFavoriteLists;
 import au.com.simplesoftware.gc.util.LocationUtil;
 
 
-public class MainActivity extends AppCompatActivity implements LocationListener, GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnMarkerClickListener {
+public class MainActivity extends AppCompatActivity implements LocationListener {
 
     public static final int MAX_POST_SEARCH_RESULTS = 20;
 
-    private SupportMapFragment mapFragment;
-    private Location currentLocation;
-
-    // A request to connect to Location Services
-    private LocationRequest locationRequest;
-    private GoogleApiClient locationClient;
-
-    private LinearLayout leftDrawer;
-    private ListView myPostListView;
-    private ListView myFavoriteListView;
-    private DrawerLayout contentLayout;
+    public GoogleMap map;
 
     private ActionBarDrawerToggle mDrawerToggle;
 
     private HashMap<Marker, ParseGarageSaleInfo> markerGCMap = new HashMap<Marker, ParseGarageSaleInfo>();
-    private HashMap<ParseGarageSaleInfo, Marker> gcMakerMap = new HashMap<ParseGarageSaleInfo, Marker>();
+    private HashMap<ParseGarageSaleInfo, Marker> gcMarkerMap = new HashMap<ParseGarageSaleInfo, Marker>();
 
     private MyPostsAdapter myPostsAdapter = new MyPostsAdapter(this);
     private MyFavoriateAdapter myFavoriateAdapter = new MyFavoriateAdapter(this);
@@ -73,100 +61,73 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     public static DualFavoriteLists dualFavoriteLists = new DualFavoriteLists();
     public static ParseGarageSaleInfo currentGarageSale;
 
+    private DrawerLayout mainActivityLayout;
+    private LinearLayout leftDrawer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("GarageSale" , "onCreate");
-        setContentView(R.layout.activity_main);
+        Log.d("GarageSale", "onCreate");
 
+        setContentView(R.layout.activity_main);
+        LocationUtil.init(this);
         getSupportActionBar().setDisplayUseLogoEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.drawer);
 
+        // find main layout and drawer layout
         leftDrawer = (LinearLayout) findViewById(R.id.left_drawer);
-        contentLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        myPostListView = (ListView) findViewById(R.id.left_drawer_my_posts);
-        myFavoriteListView = (ListView) findViewById(R.id.left_drawer_my_favorites);
+        mainActivityLayout = (DrawerLayout) findViewById(R.id.activity_main_layout_id);
 
+        // find map fragment
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment);
+        this.map = mapFragment.getMap();
+        // Enable the current location "blue dot"
+        map.setMyLocationEnabled(true);
+
+        // Set up the camera change handler
+        map.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+            public void onCameraChange(CameraPosition position) {
+                // When the camera changes, update the query
+                Log.d("GarageSale", "on camerage change");
+                reloadParseData(LocationUtil.generateLocation(position.target));
+            }
+        });
+        map.setOnMarkerClickListener(new MarkerClickListener(this, markerGCMap));
+
+        // find two list view in drawer
+        ListView myPostListView = (ListView) findViewById(R.id.left_drawer_my_posts);
+        ListView myFavoriteListView = (ListView) findViewById(R.id.left_drawer_my_favorites);
         // Set the adapter for the list view
         myPostListView.setAdapter(myPostsAdapter);
         myFavoriteListView.setAdapter(myFavoriateAdapter);
-
         // Set the list's click listener
-        myPostListView.setOnItemClickListener(new DrawerItemClickListener());
-        myFavoriteListView.setOnItemClickListener(new DrawerItemClickListener());
+        myPostListView.setOnItemClickListener(new MyPostItemClickListener(map, gcMarkerMap, myPostsAdapter, mainActivityLayout, leftDrawer));
+        myFavoriteListView.setOnItemClickListener(new MyFavoriateItemClickListener(map, gcMarkerMap, myFavoriateAdapter, mainActivityLayout, leftDrawer));
 
-        mDrawerToggle = new ActionBarDrawerToggle(
-                this,                  /* host Activity */
-                contentLayout,         /* DrawerLayout object */
-                R.string.drawer_open,  /* "open drawer" description */
-                R.string.drawer_close  /* "close drawer" description */
-        ) {
 
-            /** Called when a drawer has settled in a completely closed state. */
-            public void onDrawerClosed(View view) {
-                super.onDrawerClosed(view);
-                getSupportActionBar().setTitle("Garage Sale");
-                supportInvalidateOptionsMenu();
-            }
+        mDrawerToggle = new DrawerToggleListener(this, mainActivityLayout, R.string.drawer_open, R.string.drawer_close);
+        mainActivityLayout.setDrawerListener(mDrawerToggle);
 
-            /** Called when a drawer has settled in a completely open state. */
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-                getSupportActionBar().setTitle("My Posts");
-                myPostsAdapter.loadObjects();
-                supportInvalidateOptionsMenu();
-            }
-        };
-
-        contentLayout.setDrawerListener(mDrawerToggle);
-
-        LocationUtil.initiLocationRequest(locationRequest);
-
-        // Create a new location client, using the enclosing class to handle callbacks.
-        locationClient = new GoogleApiClient.Builder(this)
-                .addApi(LocationServices.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
-
-        mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(au.com.simplesoftware.gc.R.id.map_fragment);
-        // Enable the current location "blue dot"
-        mapFragment.getMap().setMyLocationEnabled(true);
-        // Set up the camera change handler
-        mapFragment.getMap().setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
-            public void onCameraChange(CameraPosition position) {
-                // When the camera changes, update the query
-
-        reloadParseData(currentLocation);
-            }
-        });
-        mapFragment.getMap().setOnMarkerClickListener((GoogleMap.OnMarkerClickListener) this);
-        Log.d("GC", "onCreate");
-
-        reloadCurrentPosition();
+        LocationUtil.init(this);
 
         MyFavoriateAdaptorQueryFactory.generate().findInBackground(new FindCallback<ParseMyFavoriate>() {
             @Override
             public void done(List list, ParseException e) {
-
-
                 if (e == null) {
                     // if query return a list
-                    Log.d("GV", "Found favoriate" + list.size() + " records");
+                    Log.d("GarageSale", "Found Favoriate" + list.size() + " records");
 
-                        dualFavoriteLists.clear();
-                        dualFavoriteLists.addAllOriginal(list);
+                    dualFavoriteLists.clear();
+                    dualFavoriteLists.addAllOriginal(list);
 
                 } else {
                     // if there is exception
-                    Log.d("GV", e.toString());
+                    Log.d("GarageSale", e.toString());
                     Toast.makeText(getApplicationContext(), "Error retriving from parse database", Toast.LENGTH_LONG);
                 }
-
             }
         });
-
     }
 
     @Override
@@ -196,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             startActivity(intent);
             return true;
         } else if (id == R.id.action_refresh) {
-            onLocationChanged(currentLocation);
+            reloadParseData(LocationUtil.latestCurrentLocation);
             return true;
         } else if (id == R.id.action_logout) {
             // Call the Parse log out method
@@ -210,143 +171,95 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     }
 
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        Toast.makeText(this, "Connect to Google Play service failed", Toast.LENGTH_LONG);
-    }
-
-    @Override
     protected void onStart() {
         super.onStart();
-        Log.d("GC", "onStart");
-        // Connect the client.
-        if (LocationUtil.isGooglePlayServiceConnected(this)) {
-            locationClient.connect();
-        }
+        Log.d("GarageSale", "onStart");
     }
-//
-//    @Override
-//    protected void onResumeFragments() {
-//        super.onResumeFragments();
-//        Log.d("GC", "onResumeFragments");
-//        ((ParseQueryAdapter) myPostListView.getAdapter()).loadObjects();
-//    }
 
     @Override
-    protected void onStop() {
-        // Disconnecting the client invalidates it.
-        Log.d("GC", "onStop");
-        locationClient.disconnect();
-        super.onStop();
+    protected void onResume() {
+        super.onResume();
+        Log.d("GarageSale", "onResume");
+        LocationUtil.connectGoogleAPIClient();
+        myPostsAdapter.notifyDataSetChanged();
+        Log.d("GarageSale", "notify mypostadaptor database changes");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LocationUtil.stopLocationUpdates();
+        LocationUtil.disconnectGoogleAPIClient();
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.d("GC", "onLocationChanged");
-        reloadCurrentPosition();
-        reloadParseData(currentLocation);
+        float[] result = new float[2];
+        Location.distanceBetween(LocationUtil.latestCurrentLocation.getLatitude(), LocationUtil.latestCurrentLocation.getLongitude(), location.getLatitude(), location.getLongitude(), result);
+
+        if (result[0] > LocationUtil.MIN_MOVE_METER) {
+            Log.d("GarageSale", "onLocationChanged - distance changed: " + result[0] + ":" + result[1]);
+            reloadParseData(LocationUtil.reloadCurrentPosition());
+        }
     }
 
-    @Override
-    public void onConnected(Bundle bundle) {
-        Log.d("GC", "onConnected");
-
-        reloadCurrentPosition();
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        Log.d("GC", "location suspended" + i);
-    }
-
-    protected void startLocationUpdates() {
-        LocationServices.FusedLocationApi.requestLocationUpdates(
-                locationClient, locationRequest, this);
-        Log.d("GC", "onConnectionSuspended");
-    }
-
-    protected void stopLocationUpdates() {
-        LocationServices.FusedLocationApi.removeLocationUpdates(
-                locationClient, this);
-        Log.d("GC", "stop location update");
-    }
-
-    private void reloadParseData(Location loc) {
-        if (loc != null)
-            currentLocation = loc;
-
-        ParseQuery<ParseGarageSaleInfo> query = GarageSaleQueryFactory.getGarageSaleQuery(currentLocation);
-            query.findInBackground(new FindCallback<ParseGarageSaleInfo>() {
-
+    void reloadParseData(Location loc) {
+        if (loc != null) {
+            ParseQuery<ParseGarageSaleInfo> aroundQuery = GarageSaleQueryFactory.getGarageSaleQuery(loc);
+            aroundQuery.findInBackground(new FindCallback<ParseGarageSaleInfo>() {
                 @Override
                 public void done(final List<ParseGarageSaleInfo> list, com.parse.ParseException e) {
-                    if (e == null) {
+                    if (e == null && !list.isEmpty()) {
                         // if query return a list
-                        Log.d("GV", "Found garagesale" + list.size() + " records");
-                        mapFragment.getMap().clear();
+                        Log.d("GarageSale", "Found surounding" + list.size() + " GarageSale records");
+                        map.clear();
                         markerGCMap.clear();
-                        gcMakerMap.clear();
+                        gcMarkerMap.clear();
 
                         for (ParseGarageSaleInfo gc : list) {
-                            addMarker(gc, "Garage Sale");
+                            addMarker(gc);
                         }
                     } else {
                         // if there is exception
-                        Log.d("GV", e.toString());
-                        Toast.makeText(getApplicationContext(), "Error retriving from parse database", Toast.LENGTH_LONG);
+                        Log.d("GarageSale", e.toString());
                     }
+
+                    ParseQuery<ParseGarageSaleInfo> mypostQuery = MyPostsAdaptorQueryFactory.generate();
+                    mypostQuery.findInBackground(new FindCallback<ParseGarageSaleInfo>() {
+
+                        @Override
+                        public void done(final List<ParseGarageSaleInfo> list, com.parse.ParseException e) {
+                            if (e == null && !list.isEmpty()) {
+                                // if query return a list
+                                Log.d("GarageSale", "Found mine " + list.size() + " GarageSale records");
+                                for (ParseGarageSaleInfo gc : list) {
+                                    addMarker(gc);
+                                }
+                            } else {
+                                // if there is exception
+                                Log.d("GarageSale", e.toString());
+                            }
+                        }
+                    });
                 }
             });
 
-
-    }
-
-    private void addMarker(ParseGarageSaleInfo gc, String title) {
-        LatLng latlng = new LatLng(gc.getLocation().getLatitude(), gc.getLocation().getLongitude());
-        MarkerOptions opt = new MarkerOptions().position(latlng).title(title).icon(
-                BitmapDescriptorFactory.fromResource(R.drawable.marker_48));
-        Marker marker = mapFragment.getMap().addMarker(opt);
-        markerGCMap.put(marker, gc);
-        gcMakerMap.put(gc, marker);
-    }
-
-    @Override
-    public boolean onMarkerClick(Marker marker) {
-
-        Log.i("GoogleMapActivity", "onMarkerClick");
-        ParseGarageSaleInfo gc = markerGCMap.get(marker);
-        currentGarageSale =gc;
-        Intent intent = new Intent(this, EditGarageSaleActivity.class);
-        startActivity(intent);
-        return true;
-    }
-
-    private void reloadCurrentPosition() {
-        if (locationClient.isConnected()) {
-            currentLocation = LocationServices.FusedLocationApi.getLastLocation(
-                    locationClient);
-            LocationUtil.moveTo(mapFragment.getMap(),currentLocation, 15);
         }
     }
 
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView parent, View view, int position, long id) {
-            selectItem(position);
+    private void addMarker(ParseGarageSaleInfo gc) {
+
+        if(gcMarkerMap.get(gc)==null) {
+            Log.d("GarageSale", "add marker " + gc.getAddress());
+            LatLng latlng = new LatLng(gc.getLocation().getLatitude(), gc.getLocation().getLongitude());
+            MarkerOptions opt = new MarkerOptions().position(latlng).title("Garage Sale").icon(
+                    BitmapDescriptorFactory.fromResource(R.drawable.marker_48));
+            Marker marker = map.addMarker(opt);
+            markerGCMap.put(marker, gc);
+            gcMarkerMap.put(gc, marker);
+        }else{
+            Log.d("GarageSale",gc.getAddress() + "is already added to map");
         }
-    }
-
-    /**
-     * Swaps fragments in the main content view
-     */
-    private void selectItem(int position) {
-
-
-        contentLayout.closeDrawer(leftDrawer);
-
-        ParseGarageSaleInfo gc = (ParseGarageSaleInfo) myPostsAdapter.getItem(position);
-        Marker marker = gcMakerMap.get(gc);
-        LocationUtil.animateTo(mapFragment.getMap(), marker.getPosition(), 15);
-
     }
 
 }

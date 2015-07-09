@@ -1,12 +1,12 @@
 package au.com.simplesoftware.gc.adaptor;
 
-import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.parse.ParseQueryAdapter;
 
+import au.com.simplesoftware.gc.MainActivity;
 import au.com.simplesoftware.gc.R;
 import au.com.simplesoftware.gc.bo.ParseGarageSaleInfo;
 
@@ -15,8 +15,10 @@ import au.com.simplesoftware.gc.bo.ParseGarageSaleInfo;
  */
 public class MyPostsAdapter extends ParseQueryAdapter<ParseGarageSaleInfo> {
 
-    public MyPostsAdapter(Context context) {
+    MainActivity context;
+    public MyPostsAdapter(MainActivity context) {
         super(context, new MyPostsAdaptorQueryFactory());
+        this.context = context;
     }
 
     @Override
@@ -27,7 +29,6 @@ public class MyPostsAdapter extends ParseQueryAdapter<ParseGarageSaleInfo> {
 
         TextView contentView = (TextView) view.findViewById(R.id.drawer_item_text_id);
         contentView.setText(post.getAddress());
-
         return view;
     }
 

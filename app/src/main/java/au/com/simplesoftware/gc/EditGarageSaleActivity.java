@@ -7,7 +7,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.parse.DeleteCallback;
 import com.parse.ParseACL;
 import com.parse.ParseException;
 import com.parse.ParseUser;
@@ -15,6 +17,7 @@ import com.parse.SaveCallback;
 
 import au.com.simplesoftware.gc.bo.ParseGarageSaleInfo;
 import au.com.simplesoftware.gc.bo.ParseMyFavoriate;
+import au.com.simplesoftware.gc.util.LocationUtil;
 import au.com.simplesoftware.gc.util.UIHelper;
 
 
@@ -46,6 +49,7 @@ public class EditGarageSaleActivity extends AppCompatActivity {
 
         if(MainActivity.currentGarageSale!=null)
         {
+            Log.d("GarageSale","view/create/edit a garageSale");
             currentGarageSale = MainActivity.currentGarageSale;
 
             favoriateImage.setOnClickListener(new View.OnClickListener() {
@@ -57,13 +61,16 @@ public class EditGarageSaleActivity extends AppCompatActivity {
             //noinspection SimplifiableIfStatement
             saveButton.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
+                    Log.d("GarageSale", "Start saving...");
                     saveGarageSale();
-                    finish();
+                    Log.d("GarageSale", "End saving");
+                    return;
                 }
             });
 
             if(currentGarageSale.getObjectId()==null)
             {
+                Log.d("GarageSale", "New one");
                 // its a new one, we can save
                 saveButton.setVisibility(View.VISIBLE);
 
@@ -71,15 +78,18 @@ public class EditGarageSaleActivity extends AppCompatActivity {
                 favoriateImage.setVisibility(View.GONE);
             }else {
                 // its existing one, we enable depending on whether current user is owner
+                Log.d("GarageSale", "Existing one");
                 if(currentGarageSale.getUser().equals(ParseUser.getCurrentUser()))
                 {
                     // we can save the changes
                     populateFields(currentGarageSale, false);
+                    saveButton.setVisibility(View.VISIBLE);
                     Log.d("GarageSale", "owner of the garagesale");
                 }
                 else {
                     // we can not save changes, make save button invisible
                     populateFields(currentGarageSale, true);
+                    saveButton.setVisibility(View.GONE);
                     Log.d("GarageSale", "not owner of the garagesale");
                 }
             }
@@ -97,7 +107,7 @@ public class EditGarageSaleActivity extends AppCompatActivity {
          getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
-    private void toggleFavoriate() {
+     private void toggleFavoriate() {
 
         final ParseMyFavoriate found = foundCurrentInMyFavoriatesList();
         if(found!=null)
@@ -105,12 +115,12 @@ public class EditGarageSaleActivity extends AppCompatActivity {
             // remove from db and favoriate list
             favoriateImage.setImageResource(R.drawable.unbookmark48);
             deletecurrentInMyFavoriatesList(found);
-//            found.deleteInBackground(new DeleteCallback() {
-//                @Override
-//                public void done(ParseException e) {
-//                    Toast.makeText(getApplicationContext(), "Removed from favoriate list", Toast.LENGTH_LONG);
-//                }
-//            });
+            found.deleteInBackground(new DeleteCallback() {
+                @Override
+                public void done(ParseException e) {
+                    Toast.makeText(getApplicationContext(), "Removed from favoriate list", Toast.LENGTH_LONG);
+                }
+            });
         }
         else {
             // add to favoriate list and add to database
@@ -118,12 +128,12 @@ public class EditGarageSaleActivity extends AppCompatActivity {
                 ParseMyFavoriate favor = new ParseMyFavoriate();
                 favor.setUser(ParseUser.getCurrentUser());
                 favor.setGarageSale(currentGarageSale);
-//                favor.saveInBackground(new SaveCallback() {
-//                    @Override
-//                    public void done(ParseException e) {
-//                        Toast.makeText(getApplicationContext(), "Added to favoriate list", Toast.LENGTH_LONG);
-//                    }
-//                });
+                favor.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        Toast.makeText(getApplicationContext(), "Added to favoriate list", Toast.LENGTH_LONG);
+                    }
+                });
                 addCurrentInMyFavoriatesList(favor);
                 favoriateImage.setImageResource(R.drawable.bookmark48);
             }
@@ -158,7 +168,7 @@ public class EditGarageSaleActivity extends AppCompatActivity {
         String msg =  messageEditText.getText().toString();
 
         // Create a post.
-        ParseGarageSaleInfo garageSaleInfo = currentGarageSale;
+        final ParseGarageSaleInfo garageSaleInfo = currentGarageSale;
         if(UIHelper.isNotEmpty(name)) {
             garageSaleInfo.setName(name);
         }
@@ -174,19 +184,27 @@ public class EditGarageSaleActivity extends AppCompatActivity {
         if(UIHelper.isNotEmpty(msg)) {
             garageSaleInfo.setMessage(msg);
         }
+
+        garageSaleInfo.setLocation(LocationUtil.generateParsePoint(LocationUtil.latestCurrentLocation));
         garageSaleInfo.setUser(ParseUser.getCurrentUser());
 
-        ParseACL acl = new ParseACL();
+        ParseACL acl = new ParseACL(ParseUser.getCurrentUser());
         // Give public read access
         acl.setPublicReadAccess(true);
+        acl.setWriteAccess(ParseUser.getCurrentUser(), true);
         garageSaleInfo.setACL(acl);
 
         // Save the post
         garageSaleInfo.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
-                Log.d("GC", "New Garage Sale Info Saved");
-                finish();
+                if (e == null) {
+                    Log.d("GarageSale", "Garage Sale Info Saved OK");
+                    finish();
+                } else {
+                    Log.d("GarageSale", "Error saving Garage Sale:"+ garageSaleInfo.getObjectId() + ", with error:" + e);
+
+                }
             }
         });
     }

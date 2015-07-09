@@ -29,9 +29,8 @@ public class MyPostItemClickListener implements ListView.OnItemClickListener {
 
     private  Map<ParseGarageSaleInfo, Marker> gcMarkerMap;
 
-    public MyPostItemClickListener(GoogleMap map, Map<ParseGarageSaleInfo, Marker> gcMarkerMap,MyPostsAdapter myPostsAdapter,
-                                   DrawerLayout contentLayout,LinearLayout leftDrawer
-    )
+    public MyPostItemClickListener(GoogleMap map, Map<ParseGarageSaleInfo, Marker> gcMarkerMap, MyPostsAdapter myPostsAdapter,
+                                   DrawerLayout contentLayout, LinearLayout leftDrawer)
     {
         this.map = map;
         this.gcMarkerMap = gcMarkerMap;
@@ -42,18 +41,11 @@ public class MyPostItemClickListener implements ListView.OnItemClickListener {
 
     @Override
     public void onItemClick(AdapterView parent, View view, int position, long id) {
-        selectItem(position);
-    }
-
-    /**
-     * Swaps fragments in the main content view
-     */
-    private void selectItem(int position) {
         contentLayout.closeDrawer(leftDrawer);
 
         ParseGarageSaleInfo gc = (ParseGarageSaleInfo) myPostsAdapter.getItem(position);
         Marker marker = gcMarkerMap.get(gc);
+        if(marker!=null)
         LocationUtil.animateTo(map, marker.getPosition(), 15);
-
     }
 }

@@ -8,8 +8,8 @@ android {
         applicationId "au.com.simplesoftware.gc"
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 3
-        versionName "3.1"
+        versionCode 4
+        versionName "4.1"
 
     }
     buildTypes {
