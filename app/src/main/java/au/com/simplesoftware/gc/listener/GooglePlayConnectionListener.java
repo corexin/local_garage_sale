@@ -27,8 +27,10 @@ public class GooglePlayConnectionListener implements GoogleApiClient.ConnectionC
     public void onConnected(Bundle bundle) {
         Log.d("GC", "onConnected");
         LocationUtil.startLocationUpdates();
+
         LocationUtil.reloadCurrentPosition();
         LocationUtil.moveToCurrentLocation(mainActivity.map, 15);
+
     }
 
     @Override

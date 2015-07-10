@@ -13,7 +13,7 @@ import java.util.Map;
 
 import au.com.simplesoftware.gc.adaptor.MyFavoriateAdapter;
 import au.com.simplesoftware.gc.bo.ParseGarageSaleInfo;
-import au.com.simplesoftware.gc.bo.ParseMyFavoriate;
+import au.com.simplesoftware.gc.bo.ParseMyFavorite;
 import au.com.simplesoftware.gc.util.LocationUtil;
 
 /**
@@ -52,7 +52,7 @@ public class MyFavoriateItemClickListener implements ListView.OnItemClickListene
     private void selectItem(int position) {
         contentLayout.closeDrawer(leftDrawer);
 
-        ParseMyFavoriate favoriate = (ParseMyFavoriate) myPostsAdapter.getItem(position);
+        ParseMyFavorite favoriate = (ParseMyFavorite) myPostsAdapter.getItem(position);
         Marker marker = gcMarkerMap.get(favoriate.getGarageSale());
         LocationUtil.animateTo(map, marker.getPosition(), 15);
 

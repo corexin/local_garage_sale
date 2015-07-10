@@ -16,7 +16,7 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import au.com.simplesoftware.gc.bo.ParseGarageSaleInfo;
-import au.com.simplesoftware.gc.bo.ParseMyFavoriate;
+import au.com.simplesoftware.gc.bo.ParseMyFavorite;
 import au.com.simplesoftware.gc.util.LocationUtil;
 import au.com.simplesoftware.gc.util.UIHelper;
 
@@ -25,7 +25,7 @@ public class EditGarageSaleActivity extends AppCompatActivity {
 
     private ParseGarageSaleInfo currentGarageSale;
 
-    private ImageView favoriateImage ;
+    private ImageView favoriateImage;
     private EditText nameEditText;
     private EditText phoneEditText;
     private EditText emailEditText;
@@ -33,23 +33,23 @@ public class EditGarageSaleActivity extends AppCompatActivity {
     private EditText messageEditText;
 
     private Button saveButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_current_garagesale);
 
-        favoriateImage = (ImageView)findViewById(R.id.action_add_favoriate_id);
+        favoriateImage = (ImageView) findViewById(R.id.action_add_favoriate_id);
         nameEditText = (EditText) findViewById(R.id.name);
         phoneEditText = (EditText) findViewById(R.id.phone);
         emailEditText = (EditText) findViewById(R.id.garagesale_contact_email);
         addressEditText = (EditText) findViewById(R.id.address);
-        messageEditText=(EditText)findViewById(R.id.message);
+        messageEditText = (EditText) findViewById(R.id.message);
 
         saveButton = (Button) findViewById(R.id.action_save);
 
-        if(MainActivity.currentGarageSale!=null)
-        {
-            Log.d("GarageSale","view/create/edit a garageSale");
+        if (MainActivity.currentGarageSale != null) {
+            Log.d("GarageSale", "view/create/edit a garageSale");
             currentGarageSale = MainActivity.currentGarageSale;
 
             favoriateImage.setOnClickListener(new View.OnClickListener() {
@@ -68,25 +68,22 @@ public class EditGarageSaleActivity extends AppCompatActivity {
                 }
             });
 
-            if(currentGarageSale.getObjectId()==null)
-            {
+            if (currentGarageSale.getObjectId() == null) {
                 Log.d("GarageSale", "New one");
                 // its a new one, we can save
                 saveButton.setVisibility(View.VISIBLE);
 
                 // we can not add favoriate as current garage sale info is not saved yet.
                 favoriateImage.setVisibility(View.GONE);
-            }else {
+            } else {
                 // its existing one, we enable depending on whether current user is owner
                 Log.d("GarageSale", "Existing one");
-                if(currentGarageSale.getUser().equals(ParseUser.getCurrentUser()))
-                {
+                if (currentGarageSale.getUser().equals(ParseUser.getCurrentUser())) {
                     // we can save the changes
                     populateFields(currentGarageSale, false);
                     saveButton.setVisibility(View.VISIBLE);
                     Log.d("GarageSale", "owner of the garagesale");
-                }
-                else {
+                } else {
                     // we can not save changes, make save button invisible
                     populateFields(currentGarageSale, true);
                     saveButton.setVisibility(View.GONE);
@@ -94,98 +91,92 @@ public class EditGarageSaleActivity extends AppCompatActivity {
                 }
             }
 
-            ParseMyFavoriate found = foundCurrentInMyFavoriatesList();
-            if(found!=null)
-            {
+            ParseMyFavorite found = MainActivity.gcFavorMap.get(MainActivity.currentGarageSale);
+            if (found != null) {
                 favoriateImage.setImageResource(R.drawable.bookmark48);
-            }
-            else {
+            } else {
                 favoriateImage.setImageResource(R.drawable.unbookmark48);
             }
 
         }
-         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
-     private void toggleFavoriate() {
+    @Override
+    protected void onPause() {
+        Log.d("GarageSale", "pause editing garagesale");
+        super.onPause();
+    }
 
-        final ParseMyFavoriate found = foundCurrentInMyFavoriatesList();
-        if(found!=null)
-        {
+    private void toggleFavoriate() {
+
+        final ParseMyFavorite found = MainActivity.gcFavorMap.get(MainActivity.currentGarageSale);
+        if (found != null) {
             // remove from db and favoriate list
             favoriateImage.setImageResource(R.drawable.unbookmark48);
-            deletecurrentInMyFavoriatesList(found);
             found.deleteInBackground(new DeleteCallback() {
                 @Override
                 public void done(ParseException e) {
-                    Toast.makeText(getApplicationContext(), "Removed from favoriate list", Toast.LENGTH_LONG);
+                    MainActivity.gcFavorMap.remove(MainActivity.currentGarageSale);
+                    Toast.makeText(getApplicationContext(), "Removed from favoriate list", Toast.LENGTH_LONG).show();
                 }
             });
-        }
-        else {
+        } else {
             // add to favoriate list and add to database
-            if(currentGarageSale.getObjectId()!=null) {
-                ParseMyFavoriate favor = new ParseMyFavoriate();
+            if (currentGarageSale.getObjectId() != null) {
+                favoriateImage.setImageResource(R.drawable.bookmark48);
+
+                final ParseMyFavorite favor = new ParseMyFavorite();
                 favor.setUser(ParseUser.getCurrentUser());
                 favor.setGarageSale(currentGarageSale);
+                ParseACL acl = new ParseACL(ParseUser.getCurrentUser());
+                // Give public read access
+                acl.setPublicReadAccess(true);
+                acl.setPublicWriteAccess(true);
+                favor.setACL(acl);
+
                 favor.saveInBackground(new SaveCallback() {
                     @Override
                     public void done(ParseException e) {
-                        Toast.makeText(getApplicationContext(), "Added to favoriate list", Toast.LENGTH_LONG);
+
+                        MainActivity.gcFavorMap.put(currentGarageSale, favor);
+                        Toast.makeText(getApplicationContext(), "Added to favoriate list", Toast.LENGTH_LONG).show();
                     }
                 });
-                addCurrentInMyFavoriatesList(favor);
-                favoriateImage.setImageResource(R.drawable.bookmark48);
+
             }
         }
 
     }
 
-    private ParseMyFavoriate foundCurrentInMyFavoriatesList() {
-        for(ParseMyFavoriate favor: MainActivity.dualFavoriteLists.myFavoriatesListUpdates)
-        {
-            if(favor.getGarageSale().equals(currentGarageSale))
-            {
-                return favor;
-            }
-        }
-        return null;
-    }
-
-    private void deletecurrentInMyFavoriatesList(ParseMyFavoriate favor) {
-        MainActivity.dualFavoriteLists.remove(favor);
-    }
-    private void addCurrentInMyFavoriatesList(ParseMyFavoriate favor) {
-        MainActivity.dualFavoriteLists.add(favor);
-    }
-
-    private void saveGarageSale () {
+    private void saveGarageSale() {
 
         String name = nameEditText.getText().toString();
         String phone = phoneEditText.getText().toString();
         String email = emailEditText.getText().toString();
-        String address =  addressEditText.getText().toString();
-        String msg =  messageEditText.getText().toString();
+        String address = addressEditText.getText().toString();
+        String msg = messageEditText.getText().toString();
 
         // Create a post.
         final ParseGarageSaleInfo garageSaleInfo = currentGarageSale;
-        if(UIHelper.isNotEmpty(name)) {
+        if (UIHelper.isNotEmpty(name)) {
             garageSaleInfo.setName(name);
         }
-        if(UIHelper.isNotEmpty(phone)){
+        if (UIHelper.isNotEmpty(phone)) {
             garageSaleInfo.setPhoneNumber(phone);
         }
-        if(UIHelper.isNotEmpty(email)) {
+        if (UIHelper.isNotEmpty(email)) {
             garageSaleInfo.setEmail(email);
         }
-        if(UIHelper.isNotEmpty(address)) {
+        if (UIHelper.isNotEmpty(address)) {
             garageSaleInfo.setAddress(address);
         }
-        if(UIHelper.isNotEmpty(msg)) {
+        if (UIHelper.isNotEmpty(msg)) {
             garageSaleInfo.setMessage(msg);
         }
-
-        garageSaleInfo.setLocation(LocationUtil.generateParsePoint(LocationUtil.latestCurrentLocation));
+        if (currentGarageSale.getLocation() == null) {
+            garageSaleInfo.setLocation(LocationUtil.generateParsePoint(LocationUtil.latestCurrentLocation));
+        }
         garageSaleInfo.setUser(ParseUser.getCurrentUser());
 
         ParseACL acl = new ParseACL(ParseUser.getCurrentUser());
@@ -202,17 +193,15 @@ public class EditGarageSaleActivity extends AppCompatActivity {
                     Log.d("GarageSale", "Garage Sale Info Saved OK");
                     finish();
                 } else {
-                    Log.d("GarageSale", "Error saving Garage Sale:"+ garageSaleInfo.getObjectId() + ", with error:" + e);
+                    Log.d("GarageSale", "Error saving Garage Sale:" + garageSaleInfo.getObjectId() + ", with error:" + e);
 
                 }
             }
         });
     }
 
-    private void populateFields(ParseGarageSaleInfo garageSaleInfo, boolean readOnly)
-    {
-        if(readOnly)
-        {
+    private void populateFields(ParseGarageSaleInfo garageSaleInfo, boolean readOnly) {
+        if (readOnly) {
             nameEditText.setFocusable(false);
             phoneEditText.setFocusable(false);
             emailEditText.setFocusable(false);

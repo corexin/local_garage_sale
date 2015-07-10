@@ -16,8 +16,8 @@ public class
     public ParseQuery<ParseGarageSaleInfo> create() {
         return generate();
     }
-    
-    public static ParseQuery<ParseGarageSaleInfo> generate() {
+
+    public static ParseQuery<ParseGarageSaleInfo>   generate() {
 
         ParseUser currentUser = ParseUser.getCurrentUser();
 

@@ -11,12 +11,11 @@ import java.util.Arrays;
 /**
  * Data model for a post.
  */
-@ParseClassName("MyFavoriate")
-public class ParseMyFavoriate extends ParseObject implements Serializable {
+@ParseClassName("MyFavorite")
+public class ParseMyFavorite extends ParseObject implements Serializable {
 
     public static final String userKey = "user";
     public static final String favoriateKey = "favoriate";
-
 
     public ParseUser getUser() {
         return getParseUser(userKey);
@@ -35,8 +34,8 @@ public class ParseMyFavoriate extends ParseObject implements Serializable {
     }
 
 
-    public static ParseQuery<ParseMyFavoriate> getQuery() {
-        return ParseQuery.getQuery(ParseMyFavoriate.class);
+    public static ParseQuery<ParseMyFavorite> getQuery() {
+        return ParseQuery.getQuery(ParseMyFavorite.class);
     }
 
     @Override
@@ -48,8 +47,8 @@ public class ParseMyFavoriate extends ParseObject implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof ParseMyFavoriate) {
-            ParseMyFavoriate other = (ParseMyFavoriate) o;
+        if (o instanceof ParseMyFavorite) {
+            ParseMyFavorite other = (ParseMyFavorite) o;
             return Arrays.equals(new Object[]{getUser(), getGarageSale().getObjectId()}, new Object[]{other.getUser(), other.getGarageSale().getObjectId()});
 
         } else {

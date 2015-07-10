@@ -4,27 +4,27 @@ import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
 
-import au.com.simplesoftware.gc.bo.ParseMyFavoriate;
+import au.com.simplesoftware.gc.bo.ParseMyFavorite;
 
 /**
  * Created by steven on 28/06/2015.
  */
 public class
 
-        MyFavoriateAdaptorQueryFactory implements ParseQueryAdapter.QueryFactory<ParseMyFavoriate> {
+        MyFavoriateAdaptorQueryFactory implements ParseQueryAdapter.QueryFactory<ParseMyFavorite> {
 
 
-    public ParseQuery<ParseMyFavoriate> create() {
+    public ParseQuery<ParseMyFavorite> create() {
         return generate();
     }
 
-    public static ParseQuery<ParseMyFavoriate> generate()
+    public static ParseQuery<ParseMyFavorite> generate()
     {   ParseUser currentUser = ParseUser.getCurrentUser();
-        ParseQuery<ParseMyFavoriate> query = ParseMyFavoriate.getQuery();
+        ParseQuery<ParseMyFavorite> query = ParseMyFavorite.getQuery();
         query.orderByDescending("createdAt");
-        query.whereEqualTo(ParseMyFavoriate.userKey, currentUser);
-        query.include(ParseMyFavoriate.userKey);
-        query.include(ParseMyFavoriate.favoriateKey);
+        query.whereEqualTo(ParseMyFavorite.userKey, currentUser);
+        query.include(ParseMyFavorite.userKey);
+        query.include(ParseMyFavorite.favoriateKey);
         return query;
     }
 }

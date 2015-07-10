@@ -11,7 +11,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.GoogleMap;
@@ -22,7 +21,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.FindCallback;
-import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
@@ -35,12 +33,11 @@ import au.com.simplesoftware.gc.adaptor.MyFavoriateAdaptorQueryFactory;
 import au.com.simplesoftware.gc.adaptor.MyPostsAdapter;
 import au.com.simplesoftware.gc.adaptor.MyPostsAdaptorQueryFactory;
 import au.com.simplesoftware.gc.bo.ParseGarageSaleInfo;
-import au.com.simplesoftware.gc.bo.ParseMyFavoriate;
+import au.com.simplesoftware.gc.bo.ParseMyFavorite;
 import au.com.simplesoftware.gc.listener.DrawerToggleListener;
 import au.com.simplesoftware.gc.listener.MarkerClickListener;
 import au.com.simplesoftware.gc.listener.MyFavoriateItemClickListener;
 import au.com.simplesoftware.gc.listener.MyPostItemClickListener;
-import au.com.simplesoftware.gc.util.DualFavoriteLists;
 import au.com.simplesoftware.gc.util.LocationUtil;
 
 
@@ -52,23 +49,22 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     private ActionBarDrawerToggle mDrawerToggle;
 
-    private HashMap<Marker, ParseGarageSaleInfo> markerGCMap = new HashMap<Marker, ParseGarageSaleInfo>();
-    private HashMap<ParseGarageSaleInfo, Marker> gcMarkerMap = new HashMap<ParseGarageSaleInfo, Marker>();
+    public static HashMap<Marker, ParseGarageSaleInfo> markerGCMap = new HashMap<Marker, ParseGarageSaleInfo>();
+    public static HashMap<ParseGarageSaleInfo, Marker> gcMarkerMap = new HashMap<ParseGarageSaleInfo, Marker>();
+    public static HashMap<ParseGarageSaleInfo, ParseMyFavorite> gcFavorMap = new HashMap<ParseGarageSaleInfo,ParseMyFavorite>();
+    public static ParseGarageSaleInfo currentGarageSale;
 
     private MyPostsAdapter myPostsAdapter = new MyPostsAdapter(this);
     private MyFavoriateAdapter myFavoriateAdapter = new MyFavoriateAdapter(this);
 
-    public static DualFavoriteLists dualFavoriteLists = new DualFavoriteLists();
-    public static ParseGarageSaleInfo currentGarageSale;
-
     private DrawerLayout mainActivityLayout;
     private LinearLayout leftDrawer;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d("GarageSale", "onCreate");
-
         setContentView(R.layout.activity_main);
         LocationUtil.init(this);
         getSupportActionBar().setDisplayUseLogoEnabled(true);
@@ -84,7 +80,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         this.map = mapFragment.getMap();
         // Enable the current location "blue dot"
         map.setMyLocationEnabled(true);
-
         // Set up the camera change handler
         map.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             public void onCameraChange(CameraPosition position) {
@@ -105,29 +100,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         myPostListView.setOnItemClickListener(new MyPostItemClickListener(map, gcMarkerMap, myPostsAdapter, mainActivityLayout, leftDrawer));
         myFavoriteListView.setOnItemClickListener(new MyFavoriateItemClickListener(map, gcMarkerMap, myFavoriateAdapter, mainActivityLayout, leftDrawer));
 
-
         mDrawerToggle = new DrawerToggleListener(this, mainActivityLayout, R.string.drawer_open, R.string.drawer_close);
         mainActivityLayout.setDrawerListener(mDrawerToggle);
 
         LocationUtil.init(this);
 
-        MyFavoriateAdaptorQueryFactory.generate().findInBackground(new FindCallback<ParseMyFavoriate>() {
-            @Override
-            public void done(List list, ParseException e) {
-                if (e == null) {
-                    // if query return a list
-                    Log.d("GarageSale", "Found Favoriate" + list.size() + " records");
-
-                    dualFavoriteLists.clear();
-                    dualFavoriteLists.addAllOriginal(list);
-
-                } else {
-                    // if there is exception
-                    Log.d("GarageSale", e.toString());
-                    Toast.makeText(getApplicationContext(), "Error retriving from parse database", Toast.LENGTH_LONG);
-                }
-            }
-        });
     }
 
     @Override
@@ -181,7 +158,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         super.onResume();
         Log.d("GarageSale", "onResume");
         LocationUtil.connectGoogleAPIClient();
-        myPostsAdapter.notifyDataSetChanged();
+        myPostsAdapter.loadObjects();
+        myFavoriateAdapter.loadObjects();
+        mainActivityLayout.closeDrawer(leftDrawer);
         Log.d("GarageSale", "notify mypostadaptor database changes");
     }
 
@@ -203,19 +182,22 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
-    void reloadParseData(Location loc) {
+    void reloadParseData(final Location loc) {
         if (loc != null) {
-            ParseQuery<ParseGarageSaleInfo> aroundQuery = GarageSaleQueryFactory.getGarageSaleQuery(loc);
-            aroundQuery.findInBackground(new FindCallback<ParseGarageSaleInfo>() {
+
+            ParseQuery<ParseGarageSaleInfo> mypostQuery = MyPostsAdaptorQueryFactory.generate();
+            mypostQuery.findInBackground(new FindCallback<ParseGarageSaleInfo>() {
+
                 @Override
                 public void done(final List<ParseGarageSaleInfo> list, com.parse.ParseException e) {
                     if (e == null && !list.isEmpty()) {
                         // if query return a list
-                        Log.d("GarageSale", "Found surounding" + list.size() + " GarageSale records");
-                        map.clear();
-                        markerGCMap.clear();
-                        gcMarkerMap.clear();
-
+                        Log.d("GarageSale", "Found my " + list.size() + " GarageSale records");
+                        if(!list.isEmpty()) {
+                            map.clear();
+                            markerGCMap.clear();
+                            gcMarkerMap.clear();
+                        }
                         for (ParseGarageSaleInfo gc : list) {
                             addMarker(gc);
                         }
@@ -224,14 +206,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                         Log.d("GarageSale", e.toString());
                     }
 
-                    ParseQuery<ParseGarageSaleInfo> mypostQuery = MyPostsAdaptorQueryFactory.generate();
-                    mypostQuery.findInBackground(new FindCallback<ParseGarageSaleInfo>() {
-
+                    ParseQuery<ParseGarageSaleInfo> aroundQuery = GarageSaleQueryFactory.getGarageSaleQuery(loc);
+                    aroundQuery.findInBackground(new FindCallback<ParseGarageSaleInfo>() {
                         @Override
                         public void done(final List<ParseGarageSaleInfo> list, com.parse.ParseException e) {
-                            if (e == null && !list.isEmpty()) {
+                            if (e == null) {
                                 // if query return a list
-                                Log.d("GarageSale", "Found mine " + list.size() + " GarageSale records");
+                                Log.d("GarageSale", "Found surounding" + list.size() + " GarageSale records");
+
                                 for (ParseGarageSaleInfo gc : list) {
                                     addMarker(gc);
                                 }
@@ -241,9 +223,30 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                             }
                         }
                     });
+
+                    // my favorite data
+                    ParseQuery<ParseMyFavorite> myFavoriteQuery = MyFavoriateAdaptorQueryFactory.generate();
+                    myFavoriteQuery.findInBackground(new FindCallback<ParseMyFavorite>() {
+                        @Override
+                        public void done(final List<ParseMyFavorite> list, com.parse.ParseException e) {
+                            if (e == null ) {
+                                // if query return a list
+                                Log.d("GarageSale", "Found " + list.size() + " favorites records");
+                                if(!list.isEmpty()) {
+                                    gcFavorMap.clear();
+                                }
+                                for (ParseMyFavorite favor : list) {
+                                    gcFavorMap.put(favor.getGarageSale(),favor);
+                                    addMarker(favor.getGarageSale());
+                                }
+                            } else {
+                                // if there is exception
+                                Log.d("GarageSale", e.toString());
+                            }
+                        }
+                    });
                 }
             });
-
         }
     }
 
