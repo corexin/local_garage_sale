@@ -29,7 +29,7 @@ public class GooglePlayConnectionListener implements GoogleApiClient.ConnectionC
         LocationUtil.startLocationUpdates();
 
         LocationUtil.reloadCurrentPosition();
-        LocationUtil.moveToCurrentLocation(mainActivity.map, 15);
+        LocationUtil.moveToLatestCamLocation(mainActivity.map, 15);
 
     }
 

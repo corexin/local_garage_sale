@@ -26,8 +26,6 @@ import au.com.simplesoftware.gc.listener.GooglePlayConnectionListener;
  */
 public class LocationUtil {
 
-    public static float MIN_MOVE_METER = 10f;
-
     // The update interval
     private static final int UPDATE_INTERVAL_IN_SECONDS = 10;
     // Milliseconds per second
@@ -47,8 +45,11 @@ public class LocationUtil {
 
     public static GoogleApiClient googleApiClient;
     public static LocationRequest locationRequest;
+
+    public static Location latestDeviceLocation;
+    public static Location latestCameraLocation;
+    public static float MIN_MOV_DISTANCE_FOR_RELOAD = 200f;
     private static MainActivity mainActivity;
-    public static Location latestCurrentLocation;
 
     private LocationUtil() {
     }
@@ -56,7 +57,7 @@ public class LocationUtil {
     public static void init(MainActivity ctx) {
         mainActivity = ctx;
         initGoogleApiClient(ctx);
-        initiLocationRequest();
+        initLocationRequest();
         Log.d("GarageSale", "LocationUtil init");
     }
 
@@ -65,7 +66,7 @@ public class LocationUtil {
         googleApiClient = new GoogleApiClient.Builder(ctx).addApi(LocationServices.API).addConnectionCallbacks(listener).addOnConnectionFailedListener(listener).build();
     }
 
-    public static void initiLocationRequest() {
+    public static void initLocationRequest() {
         // Create a new global location parameters object
         locationRequest = LocationRequest.create();
         // Set the update interval
@@ -149,9 +150,12 @@ public class LocationUtil {
         map.animateCamera(cameraUpdate);
     }
 
-    public static void moveToCurrentLocation(GoogleMap map, int zoom) {
-        LatLng latLng = new LatLng(latestCurrentLocation.getLatitude(), latestCurrentLocation.getLongitude());
-        moveTo(map, latLng, zoom);
+    public static void moveToLatestCamLocation(GoogleMap map, int zoom) {
+        if (latestCameraLocation != null) {
+            moveTo(map, latestCameraLocation, zoom);
+        } else {
+            moveTo(map, latestDeviceLocation, zoom);
+        }
     }
 
     public static void moveTo(GoogleMap map, Location location, int zoom) {
@@ -167,12 +171,12 @@ public class LocationUtil {
     public static Location reloadCurrentPosition() {
 
         if (googleApiClient != null && googleApiClient.isConnected()) {
-            latestCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(
+            latestDeviceLocation = LocationServices.FusedLocationApi.getLastLocation(
                     googleApiClient);
-            Log.d("GC", latestCurrentLocation.getLatitude() + ":" + latestCurrentLocation.getLongitude());
+            Log.d("GC", latestDeviceLocation.getLatitude() + ":" + latestDeviceLocation.getLongitude());
         }
 
-        return latestCurrentLocation;
+        return latestDeviceLocation;
     }
 
     public static Location generateLocation(LatLng target) {
@@ -180,5 +184,16 @@ public class LocationUtil {
         result.setLatitude(target.latitude);
         result.setLongitude(target.longitude);
         return result;
+    }
+
+    public static boolean distanceLargerThanMIN(Location loc1, Location loc2) {
+        float[] result = new float[5];
+        if (loc1 != null && loc2 != null) {
+            Location.distanceBetween(loc1.getLatitude(), loc1.getLongitude(), loc2.getLatitude(), loc2.getLongitude(), result);
+            Log.d("GarageSale", "distance between to points is: " + result[0] + " larger than MIN?" + (result[0] > MIN_MOV_DISTANCE_FOR_RELOAD));
+            return result[0] > MIN_MOV_DISTANCE_FOR_RELOAD;
+        } else {
+            return false;
+        }
     }
 }

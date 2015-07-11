@@ -11,7 +11,7 @@ import com.google.android.gms.maps.model.Marker;
 
 import java.util.Map;
 
-import au.com.simplesoftware.gc.adaptor.MyFavoriateAdapter;
+import au.com.simplesoftware.gc.adaptor.MyFavoriteAdapter;
 import au.com.simplesoftware.gc.bo.ParseGarageSaleInfo;
 import au.com.simplesoftware.gc.bo.ParseMyFavorite;
 import au.com.simplesoftware.gc.util.LocationUtil;
@@ -26,11 +26,11 @@ public class MyFavoriateItemClickListener implements ListView.OnItemClickListene
     private LinearLayout leftDrawer;
     private DrawerLayout contentLayout;
 
-    private MyFavoriateAdapter myPostsAdapter;
+    private MyFavoriteAdapter myPostsAdapter;
 
     private  Map<ParseGarageSaleInfo, Marker> gcMarkerMap;
 
-    public MyFavoriateItemClickListener(GoogleMap map, Map<ParseGarageSaleInfo, Marker> gcMarkerMap, MyFavoriateAdapter myPostsAdapter,
+    public MyFavoriateItemClickListener(GoogleMap map, Map<ParseGarageSaleInfo, Marker> gcMarkerMap, MyFavoriteAdapter myPostsAdapter,
                                         DrawerLayout contentLayout, LinearLayout leftDrawer
     )
     {

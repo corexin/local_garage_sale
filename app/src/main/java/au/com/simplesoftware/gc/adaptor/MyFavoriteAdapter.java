@@ -16,9 +16,9 @@ import au.com.simplesoftware.gc.bo.ParseMyFavorite;
 /**
  * Created by steven on 28/06/2015.
  */
-public class MyFavoriateAdapter extends ParseQueryAdapter<ParseMyFavorite> {
+public class MyFavoriteAdapter extends ParseQueryAdapter<ParseMyFavorite> {
 
-    public MyFavoriateAdapter(Context context) {
+    public MyFavoriteAdapter(Context context) {
         super(context, new MyFavoriateAdaptorQueryFactory());
     }
 

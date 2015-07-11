@@ -1,6 +1,7 @@
 package au.com.simplesoftware.gc.adaptor;
 
 import android.location.Location;
+import android.util.Log;
 
 import com.parse.ParseQuery;
 
@@ -23,6 +24,7 @@ public class GarageSaleQueryFactory {
         query.whereGreaterThan("createdAt", currentCal.getTime());
 
         Float distance = GarageSaleApplication.getSearchDistance();
+        Log.d("GarageSale", "use search distance: "+ distance);
         query.whereWithinKilometers("location", LocationUtil.generateParsePoint(currentLocation), distance);
 
         query.setLimit(MainActivity.MAX_POST_SEARCH_RESULTS);
